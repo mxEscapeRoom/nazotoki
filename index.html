@@ -10,7 +10,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow-y: auto; /* Googleサイトでの二重スクロールバー防止 */
+            overflow-y: auto;
         }
 
         body {
@@ -39,7 +39,7 @@
 
         /* --- 各ステップの共通スタイル --- */
         h1, h2 {
-            color: #00ffff; /* サイバーな印象のシアン */
+            color: #00ffff;
             margin-bottom: 25px;
             text-shadow: 0 0 5px #00ffff;
         }
@@ -118,19 +118,19 @@
         /* --- フィードバックメッセージ --- */
         #feedback-message, #final-feedback-message {
             margin-top: 20px;
-            color: #ff4d4d; /* エラーメッセージは赤色 */
+            color: #ff4d4d;
             font-weight: bold;
             min-height: 24px;
         }
 
         /* --- クリア画面 --- */
         #step3 h1 {
-            color: #00ff7f; /* クリアはライムグリーン */
+            color: #00ff7f;
             text-shadow: 0 0 10px #00ff7f;
         }
 
         .slack-btn {
-            background: linear-gradient(45deg, #4a154b, #36c5f0); /* Slackカラー風 */
+            background: linear-gradient(45deg, #4a154b, #36c5f0);
             color: white;
             font-weight: bold;
         }
@@ -175,11 +175,29 @@
         .hidden {
             display: none;
         }
+        
+        /* --- キラキラ文字のスタイル --- */
+        .sparkle-text {
+            font-size: 2em;
+            font-weight: bold;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #ffdd77;
+                color: #fff;
+            }
+            50% {
+                text-shadow: 0 0 20px #ffdd77, 0 0 30px #ffdd77, 0 0 40px #ffdd77;
+                color: #ffdd77;
+            }
+        }
 
         /* --- スマホ表示で上部が切れる問題の対策 --- */
         @media (max-width: 768px) {
             body {
-                align-items: flex-start; /* 縦方向の配置を中央から上揃えに変更 */
+                align-items: flex-start;
             }
         }
     </style>
@@ -209,15 +227,10 @@
         <!-- ===== ステップ2: 最終問題 ===== -->
         <div id="step2" class="hidden">
             <h1>最終問題</h1>
-
             <div id="step1-answers-summary"></div>
-            
             <h3>最後の謎</h3>
-            <!-- ↓↓↓ 指示文を修正しました ↓↓↓ -->
             <p>この画像と第一関門の答えを元に、最後のキーワードを導き出せ。こたえはすべてひらがなを入力してください。</p>
-            
             <img id="riddle-image" src="https://github.com/mxEscapeRoom/nazotoki/blob/main/last.png?raw=true" alt="謎の画像">
-            
             <div class="question-item" style="max-width: 300px; margin: 0 auto 30px auto;">
                 <label for="final-q">最後の答え</label>
                 <input type="text" id="final-q" name="final-q">
@@ -229,8 +242,15 @@
         <!-- ===== ステップ3: クリア画面 ===== -->
         <div id="step3" class="hidden">
             <h1>CLEAR!</h1>
-            <p>すべての謎を解き明かした！<br>下のボタンからぜひサークルへ参加してね！</p>
+            <p>すべての謎を解き明かした！<br>下のボタンから報告チャンネルへ移動し、クリアしたチーム名を投稿してください。</p>
             <a id="slack-link" href="#" class="btn slack-btn" target="_blank" rel="noopener noreferrer">報告用Slackチャンネルへ</a>
+        </div>
+        
+        <!-- ===== 裏クリア画面（新規追加） ===== -->
+        <div id="step-secret-clear" class="hidden">
+            <h1 class="sparkle-text">裏クリア成功！</h1>
+            <p style="font-size: 1.1em;">脱出ゲーム向いている性格しているよ！<br>ぜひサークルへ参加して！</p>
+            <a id="secret-slack-link" href="#" class="btn slack-btn" target="_blank" rel="noopener noreferrer">サークルのSlackへ</a>
         </div>
 
     </div>
@@ -241,8 +261,8 @@
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
             const config = {
-                step1Answers: [ "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ" ],
-                step2Answer: "みくしいなぞとき",
+                step1Answers: [ "こたえ1", "こたえ2", "こたえ3", "こたえ4", "こたえ5", "こたえ6", "こたえ7", "こたえ8" ],
+                step2Answer: "さいごのこたえ",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
             };
             // ==================================================
@@ -254,6 +274,7 @@
             const step1 = document.getElementById('step1');
             const step2 = document.getElementById('step2');
             const step3 = document.getElementById('step3');
+            const stepSecretClear = document.getElementById('step-secret-clear'); // 新規
 
             const step1Inputs = Array.from({ length: 8 }, (_, i) => document.getElementById(`q${i + 1}`));
             const checkStep1Btn = document.getElementById('check-step1');
@@ -266,29 +287,41 @@
             const finalFeedbackMessage = document.getElementById('final-feedback-message');
             
             const slackLink = document.getElementById('slack-link');
+            const secretSlackLink = document.getElementById('secret-slack-link'); // 新規
 
             // --- 初期設定 ---
             slackLink.href = config.slackUrl;
+            secretSlackLink.href = config.slackUrl; // 裏クリアも同じURLに設定
 
             // --- イベントリスナー ---
 
             checkStep1Btn.addEventListener('click', function() {
-                const userAnswers = step1Inputs.map(input => input.value.trim().toLowerCase());
+                const userAnswers = step1Inputs.map(input => input.value.trim());
+
+                // ▼▼▼ 裏クリアの判定処理を先に追加 ▼▼▼
+                const isSecretClear = userAnswers.every(answer => answer === "ひらがな");
+                if (isSecretClear) {
+                    step1.classList.add('hidden');
+                    stepSecretClear.classList.remove('hidden');
+                    return; // 通常の判定は行わずに終了
+                }
+                // ▲▲▲ ここまで追加 ▲▲▲
+
+                // --- ↓↓↓ 通常の正解判定 ↓↓↓ ---
+                const userAnswersLower = userAnswers.map(ans => ans.toLowerCase());
                 const correctAnswers = config.step1Answers.map(ans => ans.toLowerCase());
                 
                 const incorrectQuestions = [];
-                for (let i = 0; i < userAnswers.length; i++) {
-                    if (userAnswers[i] !== correctAnswers[i]) {
+                for (let i = 0; i < userAnswersLower.length; i++) {
+                    if (userAnswersLower[i] !== correctAnswers[i]) {
                         incorrectQuestions.push(`問${i + 1}`);
                     }
                 }
 
                 if (incorrectQuestions.length === 0) {
-                    // 正解
-                    
+                    // 通常の正解
                     let summaryHtml = '<h3>第一関門の答え</h3><table class="summary-table">';
-                    const rawUserAnswers = step1Inputs.map(input => input.value); // 元の入力を取得
-                    rawUserAnswers.forEach((answer, index) => {
+                    userAnswers.forEach((answer, index) => {
                         summaryHtml += `<tr><th>問${index + 1}</th><td>${answer}</td></tr>`;
                     });
                     summaryHtml += '</table>';
