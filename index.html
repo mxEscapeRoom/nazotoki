@@ -242,11 +242,11 @@
         <!-- ===== ステップ3: クリア画面 ===== -->
         <div id="step3" class="hidden">
             <h1>CLEAR!</h1>
-            <p>すべての謎を解き明かした！<br>下のボタンから報告チャンネルへ移動し、クリアしたチーム名を投稿してください。</p>
-            <a id="slack-link" href="#" class="btn slack-btn" target="_blank" rel="noopener noreferrer">報告用Slackチャンネルへ</a>
+            <p>Congratulations！すべての謎を解き明かした！<br>下のボタンからぜひサークルへ参加してね！</p>
+            <a id="slack-link" href="#" class="btn slack-btn" target="_blank" rel="noopener noreferrer">サークルへの参加はこちら</a>
         </div>
         
-        <!-- ===== 裏クリア画面（新規追加） ===== -->
+        <!-- ===== 裏クリア画面 ===== -->
         <div id="step-secret-clear" class="hidden">
             <h1 class="sparkle-text">裏クリア成功！</h1>
             <p style="font-size: 1.1em;">脱出ゲーム向いている性格しているよ！<br>ぜひサークルへ参加して！</p>
@@ -261,8 +261,9 @@
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
             const config = {
-                step1Answers: [ "こたえ1", "こたえ2", "こたえ3", "こたえ4", "こたえ5", "こたえ6", "こたえ7", "こたえ8" ],
-                step2Answer: "さいごのこたえ",
+                // ↓↓↓ ご指定の解答に設定しました ↓↓↓
+                step1Answers: [ "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ" ],
+                step2Answer: "みくしいなぞとき",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
             };
             // ==================================================
@@ -274,7 +275,7 @@
             const step1 = document.getElementById('step1');
             const step2 = document.getElementById('step2');
             const step3 = document.getElementById('step3');
-            const stepSecretClear = document.getElementById('step-secret-clear'); // 新規
+            const stepSecretClear = document.getElementById('step-secret-clear');
 
             const step1Inputs = Array.from({ length: 8 }, (_, i) => document.getElementById(`q${i + 1}`));
             const checkStep1Btn = document.getElementById('check-step1');
@@ -287,27 +288,24 @@
             const finalFeedbackMessage = document.getElementById('final-feedback-message');
             
             const slackLink = document.getElementById('slack-link');
-            const secretSlackLink = document.getElementById('secret-slack-link'); // 新規
+            const secretSlackLink = document.getElementById('secret-slack-link');
 
             // --- 初期設定 ---
             slackLink.href = config.slackUrl;
-            secretSlackLink.href = config.slackUrl; // 裏クリアも同じURLに設定
+            secretSlackLink.href = config.slackUrl;
 
             // --- イベントリスナー ---
 
             checkStep1Btn.addEventListener('click', function() {
                 const userAnswers = step1Inputs.map(input => input.value.trim());
 
-                // ▼▼▼ 裏クリアの判定処理を先に追加 ▼▼▼
                 const isSecretClear = userAnswers.every(answer => answer === "ひらがな");
                 if (isSecretClear) {
                     step1.classList.add('hidden');
                     stepSecretClear.classList.remove('hidden');
-                    return; // 通常の判定は行わずに終了
+                    return;
                 }
-                // ▲▲▲ ここまで追加 ▲▲▲
 
-                // --- ↓↓↓ 通常の正解判定 ↓↓↓ ---
                 const userAnswersLower = userAnswers.map(ans => ans.toLowerCase());
                 const correctAnswers = config.step1Answers.map(ans => ans.toLowerCase());
                 
@@ -319,7 +317,6 @@
                 }
 
                 if (incorrectQuestions.length === 0) {
-                    // 通常の正解
                     let summaryHtml = '<h3>第一関門の答え</h3><table class="summary-table">';
                     userAnswers.forEach((answer, index) => {
                         summaryHtml += `<tr><th>問${index + 1}</th><td>${answer}</td></tr>`;
@@ -331,7 +328,6 @@
                     step2.classList.remove('hidden');
 
                 } else {
-                    // 不正解
                     feedbackMessage.textContent = `${incorrectQuestions.join('と')}が違います。`;
                 }
             });
@@ -341,11 +337,9 @@
                 const correctAnswer = config.step2Answer.toLowerCase();
 
                 if (userAnswer === correctAnswer) {
-                    // 正解
                     step2.classList.add('hidden');
                     step3.classList.remove('hidden');
                 } else {
-                    // 不正解
                     finalFeedbackMessage.textContent = "答えが違うようです。";
                     setTimeout(() => {
                         finalFeedbackMessage.textContent = "";
