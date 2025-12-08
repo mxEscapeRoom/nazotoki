@@ -175,6 +175,13 @@
         .hidden {
             display: none;
         }
+
+        /* --- スマホ表示で上部が切れる問題の対策 --- */
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start; /* 縦方向の配置を中央から上揃えに変更 */
+            }
+        }
     </style>
 </head>
 <body>
@@ -203,14 +210,12 @@
         <div id="step2" class="hidden">
             <h1>最終問題</h1>
 
-            <!-- ▼▼▼ 答えのサマリー表示 ▼▼▼ -->
             <div id="step1-answers-summary"></div>
             
             <h3>最後の謎</h3>
             <p>この画像と第一関門の答えを元に、最後のキーワードを導き出せ。</p>
             
-            <!-- ▼▼▼ 画像表示 ▼▼▼ -->
-            <img id="riddle-image" src="https://github.com/mxEscapeRoom/nazotoki/blob/main/last.png?raw=true" alt="謎の画像">
+            <img id="riddle-image" src="https://via.placeholder.com/400x200.png/1a1a1a/cccccc?text=ここに画像のURLを設定" alt="謎の画像">
             
             <div class="question-item" style="max-width: 300px; margin: 0 auto 30px auto;">
                 <label for="final-q">最後の答え</label>
@@ -280,7 +285,6 @@
                 if (incorrectQuestions.length === 0) {
                     // 正解
                     
-                    // ▼▼▼ ステップ1の答えを表示する処理を追加 ▼▼▼
                     let summaryHtml = '<h3>第一関門の答え</h3><table class="summary-table">';
                     const rawUserAnswers = step1Inputs.map(input => input.value); // 元の入力を取得
                     rawUserAnswers.forEach((answer, index) => {
@@ -288,7 +292,6 @@
                     });
                     summaryHtml += '</table>';
                     summaryContainer.innerHTML = summaryHtml;
-                    // ▲▲▲ ここまで追加 ▲▲▲
 
                     step1.classList.add('hidden');
                     step2.classList.remove('hidden');
