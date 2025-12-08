@@ -23,6 +23,7 @@
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
+            min-height: 100vh;
         }
 
         /* --- コンテンツコンテナ --- */
@@ -41,6 +42,14 @@
             color: #00ffff; /* サイバーな印象のシアン */
             margin-bottom: 25px;
             text-shadow: 0 0 5px #00ffff;
+        }
+        
+        h3 {
+            color: #c0c0c0;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
         }
 
         p {
@@ -130,6 +139,38 @@
             box-shadow: 0 5px 15px rgba(54, 197, 240, 0.4);
         }
         
+        /* --- 謎解きの画像スタイル --- */
+        #riddle-image {
+            max-width: 80%;
+            height: auto;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #555;
+        }
+        
+        /* --- 答えのサマリー表示スタイル --- */
+        #step1-answers-summary {
+            background-color: #1f1f1f;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .summary-table th, .summary-table td {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+        }
+        .summary-table th {
+            color: #00ffff;
+            width: 25%;
+        }
+
         /* --- 非表示用クラス --- */
         .hidden {
             display: none;
@@ -142,10 +183,9 @@
 
         <!-- ===== ステップ1: 8問の問題 ===== -->
         <div id="step1">
-            <h1>step1</h1>
+            <h1>第一関門</h1>
             <p>8つの謎を解き明かし、答えを入力せよ。</p>
             <div class="question-grid">
-                <!-- 8問分の入力フォーム -->
                 <div class="question-item"><label for="q1">問1</label><input type="text" id="q1" name="q1"></div>
                 <div class="question-item"><label for="q2">問2</label><input type="text" id="q2" name="q2"></div>
                 <div class="question-item"><label for="q3">問3</label><input type="text" id="q3" name="q3"></div>
@@ -162,7 +202,16 @@
         <!-- ===== ステップ2: 最終問題 ===== -->
         <div id="step2" class="hidden">
             <h1>最終問題</h1>
-            <p>最後のキーワードを入力し、脱出せよ。</p>
+
+            <!-- ▼▼▼ 答えのサマリー表示 ▼▼▼ -->
+            <div id="step1-answers-summary"></div>
+            
+            <h3>最後の謎</h3>
+            <p>この画像と第一関門の答えを元に、最後のキーワードを導き出せ。</p>
+            
+            <!-- ▼▼▼ 画像表示 ▼▼▼ -->
+            <img id="riddle-image" src="https://via.placeholder.com/400x200.png/1a1a1a/cccccc?text=ここに画像のURLを設定" alt="謎の画像">
+            
             <div class="question-item" style="max-width: 300px; margin: 0 auto 30px auto;">
                 <label for="final-q">最後の答え</label>
                 <input type="text" id="final-q" name="final-q">
@@ -186,23 +235,8 @@
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
             const config = {
-                // ステップ1の8問の答えを順番に入力してください
-                // (大文字・小文字は区別されません)
-                step1Answers: [
-                    "こたえ",
-                    "こたえ",
-                    "こたえ",
-                    "こたえ",
-                    "こたえ",
-                    "こたえ",
-                    "こたえ",
-                    "こたえ"
-                ],
-
-                // ステップ2の最終問題の答えを入力してください
-                step2Answer: "みくしいなぞ",
-
-                // クリア後に表示されるSlackリンクのURLを入力してください
+                step1Answers: [ "こたえ1", "こたえ2", "こたえ3", "こたえ4", "こたえ5", "こたえ6", "こたえ7", "こたえ8" ],
+                step2Answer: "さいごのこたえ",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
             };
             // ==================================================
@@ -218,6 +252,8 @@
             const step1Inputs = Array.from({ length: 8 }, (_, i) => document.getElementById(`q${i + 1}`));
             const checkStep1Btn = document.getElementById('check-step1');
             const feedbackMessage = document.getElementById('feedback-message');
+            
+            const summaryContainer = document.getElementById('step1-answers-summary');
 
             const finalInput = document.getElementById('final-q');
             const checkStep2Btn = document.getElementById('check-step2');
@@ -230,7 +266,6 @@
 
             // --- イベントリスナー ---
 
-            // ステップ1の回答チェック
             checkStep1Btn.addEventListener('click', function() {
                 const userAnswers = step1Inputs.map(input => input.value.trim().toLowerCase());
                 const correctAnswers = config.step1Answers.map(ans => ans.toLowerCase());
@@ -244,15 +279,26 @@
 
                 if (incorrectQuestions.length === 0) {
                     // 正解
+                    
+                    // ▼▼▼ ステップ1の答えを表示する処理を追加 ▼▼▼
+                    let summaryHtml = '<h3>第一関門の答え</h3><table class="summary-table">';
+                    const rawUserAnswers = step1Inputs.map(input => input.value); // 元の入力を取得
+                    rawUserAnswers.forEach((answer, index) => {
+                        summaryHtml += `<tr><th>問${index + 1}</th><td>${answer}</td></tr>`;
+                    });
+                    summaryHtml += '</table>';
+                    summaryContainer.innerHTML = summaryHtml;
+                    // ▲▲▲ ここまで追加 ▲▲▲
+
                     step1.classList.add('hidden');
                     step2.classList.remove('hidden');
+
                 } else {
                     // 不正解
                     feedbackMessage.textContent = `${incorrectQuestions.join('と')}が違います。`;
                 }
             });
 
-            // ステップ2の回答チェック
             checkStep2Btn.addEventListener('click', function() {
                 const userAnswer = finalInput.value.trim().toLowerCase();
                 const correctAnswer = config.step2Answer.toLowerCase();
@@ -264,7 +310,6 @@
                 } else {
                     // 不正解
                     finalFeedbackMessage.textContent = "答えが違うようです。";
-                    // 1.5秒後にメッセージを消す
                     setTimeout(() => {
                         finalFeedbackMessage.textContent = "";
                     }, 1500);
