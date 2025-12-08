@@ -229,7 +229,7 @@
             <h1>最終問題</h1>
             <div id="step1-answers-summary"></div>
             <h3>最後の謎</h3>
-            <p>この画像と第一関門の答えを元に、最後のキーワードを導き出せ。こたえはすべてひらがなを入力してください。</p>
+            <p>この画像とステップ1の答えを元に、最後のキーワードを導き出せ。こたえはすべてひらがなを入力してください。</p>
             <img id="riddle-image" src="https://github.com/mxEscapeRoom/nazotoki/blob/main/last.png?raw=true" alt="謎の画像">
             <div class="question-item" style="max-width: 300px; margin: 0 auto 30px auto;">
                 <label for="final-q">最後の答え</label>
@@ -242,14 +242,14 @@
         <!-- ===== ステップ3: クリア画面 ===== -->
         <div id="step3" class="hidden">
             <h1>CLEAR!</h1>
-            <p>Congratulations！すべての謎を解き明かした！<br>下のボタンからぜひサークルへ参加してね！</p>
+            <p>Congratulations！すべての謎を解き明かした！<br>下のボタンからぜひサークルへ参加してね！<br>リアル脱出ゲームサークル(#real-d-game）</p>
             <a id="slack-link" href="#" class="btn slack-btn" target="_blank" rel="noopener noreferrer">サークルへの参加はこちら</a>
         </div>
         
         <!-- ===== 裏クリア画面 ===== -->
         <div id="step-secret-clear" class="hidden">
             <h1 class="sparkle-text">裏クリア成功！</h1>
-            <p style="font-size: 1.1em;">脱出ゲーム向いている性格しているよ！<br>ぜひサークルへ参加して！</p>
+            <p style="font-size: 1.1em;">脱出ゲーム向いている性格しているよ！<br>ぜひサークルへ参加してね！<br>リアル脱出ゲームサークル(#real-d-game）</p>
             <a id="secret-slack-link" href="#" class="btn slack-btn" target="_blank" rel="noopener noreferrer">サークルのSlackへ</a>
         </div>
 
@@ -317,7 +317,7 @@
                 }
 
                 if (incorrectQuestions.length === 0) {
-                    let summaryHtml = '<h3>第一関門の答え</h3><table class="summary-table">';
+                    let summaryHtml = '<h3>ステップ1の答え</h3><table class="summary-table">';
                     userAnswers.forEach((answer, index) => {
                         summaryHtml += `<tr><th>問${index + 1}</th><td>${answer}</td></tr>`;
                     });
