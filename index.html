@@ -211,14 +211,15 @@
             <h1>リアル脱出ゲームサークルからの挑戦状</h1>
             <p>8つの謎を解き明かし、答えを入力せよ。<br>※答えはすべて<strong>ひらがな</strong> を入力してください。</p>
             <div class="question-grid">
-                <div class="question-item"><label for="q1">問1</label><input type="text" id="q1" name="q1"></div>
-                <div class="question-item"><label for="q2">問2</label><input type="text" id="q2" name="q2"></div>
-                <div class="question-item"><label for="q3">問3</label><input type="text" id="q3" name="q3"></div>
-                <div class="question-item"><label for="q4">問4</label><input type="text" id="q4" name="q4"></div>
-                <div class="question-item"><label for="q5">問5</label><input type="text" id="q5" name="q5"></div>
-                <div class="question-item"><label for="q6">問6</label><input type="text" id="q6" name="q6"></div>
-                <div class="question-item"><label for="q7">問7</label><input type="text" id="q7" name="q7"></div>
-                <div class="question-item"><label for="q8">問8</label><input type="text" id="q8" name="q8"></div>
+                <!-- ↓↓↓ ラベルを「謎X」に修正しました ↓↓↓ -->
+                <div class="question-item"><label for="q1">謎1</label><input type="text" id="q1" name="q1"></div>
+                <div class="question-item"><label for="q2">謎2</label><input type="text" id="q2" name="q2"></div>
+                <div class="question-item"><label for="q3">謎3</label><input type="text" id="q3" name="q3"></div>
+                <div class="question-item"><label for="q4">謎4</label><input type="text" id="q4" name="q4"></div>
+                <div class="question-item"><label for="q5">謎5</label><input type="text" id="q5" name="q5"></div>
+                <div class="question-item"><label for="q6">謎6</label><input type="text" id="q6" name="q6"></div>
+                <div class="question-item"><label for="q7">謎7</label><input type="text" id="q7" name="q7"></div>
+                <div class="question-item"><label for="q8">謎8</label><input type="text" id="q8" name="q8"></div>
             </div>
             <button id="check-step1" class="btn">回答を送信</button>
             <div id="feedback-message"></div>
@@ -261,7 +262,6 @@
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
             const config = {
-                // ↓↓↓ ご指定の解答に設定しました ↓↓↓
                 step1Answers: [ "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ" ],
                 step2Answer: "みくしいなぞとき",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
@@ -269,7 +269,6 @@
             // ==================================================
             // == ↑↑↑ 設定はここまで ↑↑↑ ==
             // ==================================================
-
 
             // --- DOM要素の取得 ---
             const step1 = document.getElementById('step1');
@@ -312,14 +311,16 @@
                 const incorrectQuestions = [];
                 for (let i = 0; i < userAnswersLower.length; i++) {
                     if (userAnswersLower[i] !== correctAnswers[i]) {
-                        incorrectQuestions.push(`問${i + 1}`);
+                        // ↓↓↓ 「問」を「謎」に修正しました ↓↓↓
+                        incorrectQuestions.push(`謎${i + 1}`);
                     }
                 }
 
                 if (incorrectQuestions.length === 0) {
-                    let summaryHtml = '<h3>ステップ1の答え</h3><table class="summary-table">';
+                    // ↓↓↓ 「問」を「謎」に修正しました ↓↓↓
+                    let summaryHtml = '<h3>8つの謎の答え</h3><table class="summary-table">';
                     userAnswers.forEach((answer, index) => {
-                        summaryHtml += `<tr><th>問${index + 1}</th><td>${answer}</td></tr>`;
+                        summaryHtml += `<tr><th>謎${index + 1}</th><td>${answer}</td></tr>`;
                     });
                     summaryHtml += '</table>';
                     summaryContainer.innerHTML = summaryHtml;
