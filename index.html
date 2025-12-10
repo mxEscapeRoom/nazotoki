@@ -352,26 +352,6 @@
             slackLink.href = config.slackUrl;
             secretSlackLink.href = config.slackUrl;
 
-            // ▼▼▼ 進行状況を復元する処理 ▼▼▼
-            function restoreProgress() {
-                const savedStep = sessionStorage.getItem('nazotoki_step');
-                if (!savedStep) return;
-
-                step1.classList.add('hidden'); // まずステップ1を隠す
-
-                if (savedStep === 'step2') {
-                    const savedAnswers = JSON.parse(sessionStorage.getItem('nazotoki_answers'));
-                    if (savedAnswers) {
-                        buildSummary(savedAnswers); // サマリーを再構築
-                    }
-                    step2.classList.remove('hidden');
-                } else if (savedStep === 'step3') {
-                    step3.classList.remove('hidden');
-                } else if (savedStep === 'secret-clear') {
-                    stepSecretClear.classList.remove('hidden');
-                }
-            }
-            
             function buildSummary(answers) {
                 let summaryHtml = '<h3>7つの謎の答え</h3><table class="summary-table">';
                 answers.forEach((answer, index) => {
@@ -381,7 +361,37 @@
                 summaryContainer.innerHTML = summaryHtml;
             }
 
-            restoreProgress(); // ページ読み込み時に復元処理を呼ぶ
+            // ▼▼▼ 進行状況を復元する処理 ▼▼▼
+            function restoreProgress() {
+                console.log("ページの再読み込みを検知。進行状況の復元を開始します。");
+                const savedStep = sessionStorage.getItem('nazotoki_step');
+                console.log("保存されていたステップ:", savedStep);
+
+                if (!savedStep) {
+                    console.log("保存された進行状況はありません。ステップ1から開始します。");
+                    return;
+                }
+
+                step1.classList.add('hidden');
+
+                if (savedStep === 'step2') {
+                    console.log("ステップ2を復元します。");
+                    const savedAnswers = JSON.parse(sessionStorage.getItem('nazotoki_answers'));
+                    console.log("保存されていた答え:", savedAnswers);
+                    if (savedAnswers) {
+                        buildSummary(savedAnswers);
+                    }
+                    step2.classList.remove('hidden');
+                } else if (savedStep === 'step3') {
+                    console.log("ステップ3を復元します。");
+                    step3.classList.remove('hidden');
+                } else if (savedStep === 'secret-clear') {
+                    console.log("裏クリア画面を復元します。");
+                    stepSecretClear.classList.remove('hidden');
+                }
+            }
+
+            restoreProgress();
             // ▲▲▲ ここまで ▲▲▲
 
 
@@ -390,7 +400,8 @@
 
                 const isSecretClear = userAnswers.every(answer => answer === "ひらがな");
                 if (isSecretClear) {
-                    sessionStorage.setItem('nazotoki_step', 'secret-clear'); // 裏クリア状態を保存
+                    sessionStorage.setItem('nazotoki_step', 'secret-clear');
+                    console.log("状態を保存しました: nazotoki_step = secret-clear");
                     step1.classList.add('hidden');
                     stepSecretClear.classList.remove('hidden');
                     return;
@@ -407,8 +418,10 @@
                 }
 
                 if (incorrectQuestions.length === 0) {
-                    sessionStorage.setItem('nazotoki_step', 'step2'); // ステップ2の状態を保存
-                    sessionStorage.setItem('nazotoki_answers', JSON.stringify(userAnswers)); // 答えを保存
+                    sessionStorage.setItem('nazotoki_step', 'step2');
+                    console.log("状態を保存しました: nazotoki_step = step2");
+                    sessionStorage.setItem('nazotoki_answers', JSON.stringify(userAnswers));
+                    console.log("答えを保存しました:", userAnswers);
                     
                     buildSummary(userAnswers);
 
@@ -425,7 +438,8 @@
                 const correctAnswer = config.step2Answer.toLowerCase();
 
                 if (userAnswer === correctAnswer) {
-                    sessionStorage.setItem('nazotoki_step', 'step3'); // ステップ3の状態を保存
+                    sessionStorage.setItem('nazotoki_step', 'step3');
+                    console.log("状態を保存しました: nazotoki_step = step3");
                     step2.classList.add('hidden');
                     step3.classList.remove('hidden');
                 } else {
