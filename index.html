@@ -170,6 +170,55 @@
             color: #00ffff;
             width: 25%;
         }
+        
+        /* --- ヒントボックスのスタイル --- */
+        .hint-box {
+            max-width: 90%;
+            margin: 30px auto;
+            border: 1px dashed #555;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .hint-box summary {
+            cursor: pointer;
+            padding: 10px;
+            font-weight: bold;
+            color: #00ffff;
+            outline: none;
+            list-style: none;
+        }
+        .hint-box summary::-webkit-details-marker {
+            display: none;
+        }
+        .hint-box summary::before {
+            content: '▶ ';
+            font-size: 0.8em;
+        }
+        .hint-box[open] summary::before {
+            content: '▼ ';
+        }
+        .hint-box .hint-content {
+            padding: 0 15px 15px 15px;
+            background-color: #1f1f1f;
+            border-top: 1px dashed #555;
+        }
+        
+        /* --- ネストされたヒントボックスのスタイル --- */
+        .nested-hint-box {
+            margin-top: 15px;
+            background-color: #111;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        .nested-hint-box summary {
+            color: #f0ad4e;
+            font-weight: normal;
+            font-size: 0.9em;
+        }
+        .nested-hint-box .hint-content {
+            border-top: 1px solid #444;
+            font-size: 0.9em;
+        }
 
         /* --- 非表示用クラス --- */
         .hidden {
@@ -209,10 +258,8 @@
         <!-- ===== ステップ1: 7つの謎 ===== -->
         <div id="step1">
             <h1>リアル脱出ゲームサークルからの挑戦状</h1>
-            <!-- ↓↓↓ 8つ → 7つ に修正しました ↓↓↓ -->
             <p>7つの謎を解き明かし、答えを入力せよ。<br>※答えはすべて<strong>ひらがな</strong> を入力してください。</p>
             <div class="question-grid">
-                <!-- ↓↓↓ 謎8を削除し、7つに修正しました ↓↓↓ -->
                 <div class="question-item"><label for="q1">謎1</label><input type="text" id="q1" name="q1"></div>
                 <div class="question-item"><label for="q2">謎2</label><input type="text" id="q2" name="q2"></div>
                 <div class="question-item"><label for="q3">謎3</label><input type="text" id="q3" name="q3"></div>
@@ -230,9 +277,23 @@
             <h1>最終問題</h1>
             <div id="step1-answers-summary"></div>
             <h3>最後の謎</h3>
-            <!-- ↓↓↓ 8つ → 7つ に修正しました ↓↓↓ -->
             <p>この画像と7つの謎の答えを元に、最後のキーワードを導き出せ。</p>
             <img id="riddle-image" src="https://github.com/mxEscapeRoom/nazotoki/blob/main/last.png?raw=true" alt="謎の画像">
+            
+            <!-- ▼▼▼ 2段階ヒントボックスに修正しました ▼▼▼ -->
+            <details class="hint-box">
+                <summary>ヒント</summary>
+                <div class="hint-content">
+                    <p>色の違った○をどこかでみたことはないだろうか？7つの謎をもう一度みてみよう。</p>
+                    <details class="nested-hint-box">
+                        <summary>さらにヒント</summary>
+                        <div class="hint-content">
+                            <p>丸の中の数字は何個目かを表している。2つ目の言葉は「く」だ。</p>
+                        </div>
+                    </details>
+                </div>
+            </details>
+            
             <div class="question-item" style="max-width: 300px; margin: 0 auto 30px auto;">
                 <label for="final-q">最後の答え</label>
                 <input type="text" id="final-q" name="final-q">
@@ -263,7 +324,6 @@
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
             const config = {
-                // ↓↓↓ 答えを7つに修正しました ↓↓↓
                 step1Answers: [ "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ" ],
                 step2Answer: "みくしいなぞとき",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
@@ -278,7 +338,6 @@
             const step3 = document.getElementById('step3');
             const stepSecretClear = document.getElementById('step-secret-clear');
 
-            // ↓↓↓ lengthを8から7に修正しました ↓↓↓
             const step1Inputs = Array.from({ length: 7 }, (_, i) => document.getElementById(`q${i + 1}`));
             const checkStep1Btn = document.getElementById('check-step1');
             const feedbackMessage = document.getElementById('feedback-message');
@@ -293,64 +352,4 @@
             const secretSlackLink = document.getElementById('secret-slack-link');
 
             // --- 初期設定 ---
-            slackLink.href = config.slackUrl;
-            secretSlackLink.href = config.slackUrl;
-
-            // --- イベントリスナー ---
-
-            checkStep1Btn.addEventListener('click', function() {
-                const userAnswers = step1Inputs.map(input => input.value.trim());
-
-                const isSecretClear = userAnswers.every(answer => answer === "ひらがな");
-                if (isSecretClear) {
-                    step1.classList.add('hidden');
-                    stepSecretClear.classList.remove('hidden');
-                    return;
-                }
-
-                const userAnswersLower = userAnswers.map(ans => ans.toLowerCase());
-                const correctAnswers = config.step1Answers.map(ans => ans.toLowerCase());
-                
-                const incorrectQuestions = [];
-                for (let i = 0; i < userAnswersLower.length; i++) {
-                    if (userAnswersLower[i] !== correctAnswers[i]) {
-                        incorrectQuestions.push(`謎${i + 1}`);
-                    }
-                }
-
-                if (incorrectQuestions.length === 0) {
-                    // ↓↓↓ 8つ → 7つ に修正しました ↓↓↓
-                    let summaryHtml = '<h3>7つの謎の答え</h3><table class="summary-table">';
-                    userAnswers.forEach((answer, index) => {
-                        summaryHtml += `<tr><th>謎${index + 1}</th><td>${answer}</td></tr>`;
-                    });
-                    summaryHtml += '</table>';
-                    summaryContainer.innerHTML = summaryHtml;
-
-                    step1.classList.add('hidden');
-                    step2.classList.remove('hidden');
-
-                } else {
-                    feedbackMessage.textContent = `${incorrectQuestions.join('と')}が違います。`;
-                }
-            });
-
-            checkStep2Btn.addEventListener('click', function() {
-                const userAnswer = finalInput.value.trim().toLowerCase();
-                const correctAnswer = config.step2Answer.toLowerCase();
-
-                if (userAnswer === correctAnswer) {
-                    step2.classList.add('hidden');
-                    step3.classList.remove('hidden');
-                } else {
-                    finalFeedbackMessage.textContent = "答えが違うようです。";
-                    setTimeout(() => {
-                        finalFeedbackMessage.textContent = "";
-                    }, 1500);
-                }
-            });
-        });
-    </script>
-
-</body>
-</html>
+          
