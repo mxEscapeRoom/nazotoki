@@ -280,7 +280,6 @@
             <p>この画像と7つの謎の答えを元に、最後のキーワードを導き出せ。</p>
             <img id="riddle-image" src="https://github.com/mxEscapeRoom/nazotoki/blob/main/last.png?raw=true" alt="謎の画像">
             
-            <!-- ▼▼▼ 2段階ヒントボックスに修正しました ▼▼▼ -->
             <details class="hint-box">
                 <summary>ヒント</summary>
                 <div class="hint-content">
@@ -288,7 +287,7 @@
                     <details class="nested-hint-box">
                         <summary>さらにヒント</summary>
                         <div class="hint-content">
-                            <p>丸の中の数字は何個目かを表している。2つ目の言葉は「く」だ。</p>
+                            <p>丸の中の数字は何個目かを表している。最初の言葉は「み」</p>
                         </div>
                     </details>
                 </div>
@@ -320,6 +319,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- ここからデバッグ用コード ---
+            console.log("ページの読み込みが完了し、スクリプトが実行されました。");
+            // --- ここまでデバッグ用コード ---
+
             // ==================================================
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
@@ -328,6 +331,11 @@
                 step2Answer: "みくしいなぞとき",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
             };
+            
+            // --- ここからデバッグ用コード ---
+            console.log("設定オブジェクト:", config);
+            // --- ここまでデバッグ用コード ---
+
             // ==================================================
             // == ↑↑↑ 設定はここまで ↑↑↑ ==
             // ==================================================
@@ -351,5 +359,96 @@
             const slackLink = document.getElementById('slack-link');
             const secretSlackLink = document.getElementById('secret-slack-link');
 
+            // --- ここからデバッグ用コード ---
+            console.log("ボタン要素:", checkStep1Btn);
+            if (!checkStep1Btn) {
+                console.error("エラー: 'check-step1'ボタンが見つかりません！");
+            }
+            // --- ここまでデバッグ用コード ---
+
+
             // --- 初期設定 ---
-          
+            slackLink.href = config.slackUrl;
+            secretSlackLink.href = config.slackUrl;
+
+            // --- イベントリスナー ---
+
+            checkStep1Btn.addEventListener('click', function() {
+                // --- ここからデバッグ用コード ---
+                console.log("--- 「回答を送信」ボタンがクリックされました！ ---");
+                // --- ここまでデバッグ用コード ---
+
+                const userAnswers = step1Inputs.map(input => input.value.trim());
+                
+                // --- ここからデバッグ用コード ---
+                console.log("入力された答え:", userAnswers);
+                // --- ここまでデバッグ用コード ---
+
+                const isSecretClear = userAnswers.every(answer => answer === "ひらがな");
+                if (isSecretClear) {
+                    // --- ここからデバッグ用コード ---
+                    console.log("判定: 裏クリア！");
+                    // --- ここまでデバッグ用コード ---
+
+                    step1.classList.add('hidden');
+                    stepSecretClear.classList.remove('hidden');
+                    return;
+                }
+
+                const userAnswersLower = userAnswers.map(ans => ans.toLowerCase());
+                const correctAnswers = config.step1Answers.map(ans => ans.toLowerCase());
+                
+                const incorrectQuestions = [];
+                for (let i = 0; i < userAnswersLower.length; i++) {
+                    if (userAnswersLower[i] !== correctAnswers[i]) {
+                        incorrectQuestions.push(`謎${i + 1}`);
+                    }
+                }
+
+                // --- ここからデバッグ用コード ---
+                console.log("間違っていた問題:", incorrectQuestions);
+                // --- ここまでデバッグ用コード ---
+
+                if (incorrectQuestions.length === 0) {
+                    // --- ここからデバッグ用コード ---
+                    console.log("判定: 通常クリア！ステップ2へ進みます。");
+                    // --- ここまでデバッグ用コード ---
+
+                    let summaryHtml = '<h3>7つの謎の答え</h3><table class="summary-table">';
+                    userAnswers.forEach((answer, index) => {
+                        summaryHtml += `<tr><th>謎${index + 1}</th><td>${answer}</td></tr>`;
+                    });
+                    summaryHtml += '</table>';
+                    summaryContainer.innerHTML = summaryHtml;
+
+                    step1.classList.add('hidden');
+                    step2.classList.remove('hidden');
+
+                } else {
+                    // --- ここからデバッグ用コード ---
+                    console.log("判定: 不正解。フィードバックを表示します。");
+                    // --- ここまでデバッグ用コード ---
+
+                    feedbackMessage.textContent = `${incorrectQuestions.join('と')}が違います。`;
+                }
+            });
+
+            checkStep2Btn.addEventListener('click', function() {
+                const userAnswer = finalInput.value.trim().toLowerCase();
+                const correctAnswer = config.step2Answer.toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    step2.classList.add('hidden');
+                    step3.classList.remove('hidden');
+                } else {
+                    finalFeedbackMessage.textContent = "答えが違うようです。";
+                    setTimeout(() => {
+                        finalFeedbackMessage.textContent = "";
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
