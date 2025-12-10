@@ -319,6 +319,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("ページの読み込みが完了し、スクリプトが実行されました。");
+
             // ==================================================
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
@@ -327,6 +329,7 @@
                 step2Answer: "みくしいなぞとき",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
             };
+            console.log("設定オブジェクト:", config);
             // ==================================================
             // == ↑↑↑ 設定はここまで ↑↑↑ ==
             // ==================================================
@@ -350,57 +353,86 @@
             const slackLink = document.getElementById('slack-link');
             const secretSlackLink = document.getElementById('secret-slack-link');
 
+            console.log("ボタン要素:", checkStep1Btn);
+            if (!checkStep1Btn) {
+                console.error("エラー: 'check-step1'ボタンが見つかりません！");
+            }
+
             // --- 初期設定 ---
             slackLink.href = config.slackUrl;
             secretSlackLink.href = config.slackUrl;
 
             // --- イベントリスナー ---
+            if(checkStep1Btn) {
+                checkStep1Btn.addEventListener('click', function() {
+                    console.log("--- 「回答を送信」ボタンがクリックされました！ ---");
 
-            checkStep1Btn.addEventListener('click', function() {
-                const userAnswers = step1Inputs.map(input => input.value.trim());
-
-                const isSecretClear = userAnswers.every(answer => answer === "ひらがな");
-                if (isSecretClear) {
-                    step1.classList.add('hidden');
-                    stepSecretClear.classList.remove('hidden');
-                    return;
-                }
-
-                const userAnswersLower = userAnswers.map(ans => ans.toLowerCase());
-                const correctAnswers = config.step1Answers.map(ans => ans.toLowerCase());
-                
-                const incorrectQuestions = [];
-                for (let i = 0; i < userAnswersLower.length; i++) {
-                    if (userAnswersLower[i] !== correctAnswers[i]) {
-                        incorrectQuestions.push(`謎${i + 1}`);
-                    }
-                }
-
-                if (incorrectQuestions.length === 0) {
-                    let summaryHtml = '<h3>7つの謎の答え</h3><table class="summary-table">';
-                    userAnswers.forEach((answer, index) => {
-                        summaryHtml += `<tr><th>謎${index + 1}</th><td>${answer}</td></tr>`;
+                    const userAnswers = step1Inputs.map(input => {
+                        if (!input) {
+                            console.error("エラー: step1Inputsの中にnullの要素があります。HTMLのidが間違っている可能性があります。");
+                            return ''; // エラーの場合、空文字を返す
+                        }
+                        return input.value.trim();
                     });
-                    summaryHtml += '</table>';
-                    summaryContainer.innerHTML = summaryHtml;
+                    
+                    console.log("入力された答え:", userAnswers);
 
-                    step1.classList.add('hidden');
-                    step2.classList.remove('hidden');
+                    const isSecretClear = userAnswers.every(answer => answer === "ひらがな");
+                    if (isSecretClear) {
+                        console.log("判定: 裏クリア！");
+                        step1.classList.add('hidden');
+                        stepSecretClear.classList.remove('hidden');
+                        return;
+                    }
 
-                } else {
-                    feedbackMessage.textContent = `${incorrectQuestions.join('と')}が違います。`;
-                }
-            });
+                    const userAnswersLower = userAnswers.map(ans => ans.toLowerCase());
+                    const correctAnswers = config.step1Answers.map(ans => ans.toLowerCase());
+                    
+                    const incorrectQuestions = [];
+                    for (let i = 0; i < userAnswersLower.length; i++) {
+                        if (userAnswersLower[i] !== correctAnswers[i]) {
+                            incorrectQuestions.push(`謎${i + 1}`);
+                        }
+                    }
+                    console.log("間違っていた問題:", incorrectQuestions);
 
-            checkStep2Btn.addEventListener('click', function() {
-                const userAnswer = finalInput.value.trim().toLowerCase();
-                const correctAnswer = config.step2Answer.toLowerCase();
+                    if (incorrectQuestions.length === 0) {
+                        console.log("判定: 通常クリア！ステップ2へ進みます。");
+                        let summaryHtml = '<h3>7つの謎の答え</h3><table class="summary-table">';
+                        userAnswers.forEach((answer, index) => {
+                            summaryHtml += `<tr><th>謎${index + 1}</th><td>${answer}</td></tr>`;
+                        });
+                        summaryHtml += '</table>';
+                        summaryContainer.innerHTML = summaryHtml;
 
-                if (userAnswer === correctAnswer) {
-                    step2.classList.add('hidden');
-                    step3.classList.remove('hidden');
-                } else {
-                    finalFeedbackMessage.textContent = "答えが違うようです。";
-                    setTimeout(() => {
-                        finalFeedbackMessage.textContent = "";
-        
+                        step1.classList.add('hidden');
+                        step2.classList.remove('hidden');
+
+                    } else {
+                        console.log("判定: 不正解。フィードバックを表示します。");
+                        feedbackMessage.textContent = `${incorrectQuestions.join('と')}が違います。`;
+                    }
+                });
+            }
+
+            if(checkStep2Btn) {
+                checkStep2Btn.addEventListener('click', function() {
+                    const userAnswer = finalInput.value.trim().toLowerCase();
+                    const correctAnswer = config.step2Answer.toLowerCase();
+
+                    if (userAnswer === correctAnswer) {
+                        step2.classList.add('hidden');
+                        step3.classList.remove('hidden');
+                    } else {
+                        finalFeedbackMessage.textContent = "答えが違うようです。";
+                        setTimeout(() => {
+                            finalFeedbackMessage.textContent = "";
+                        }, 1500);
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
