@@ -162,4 +162,68 @@
             width: 100%;
             border-collapse: collapse;
         }
-        .summary-table th, .summary-table td
+        .summary-table th, .summary-table td {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+        }
+        .summary-table th {
+            color: #00ffff;
+            width: 25%;
+        }
+        
+        /* --- ヒントボックスのスタイル --- */
+        .hint-box {
+            max-width: 90%;
+            margin: 30px auto;
+            border: 1px dashed #555;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .hint-box summary {
+            cursor: pointer;
+            padding: 10px;
+            font-weight: bold;
+            color: #00ffff;
+            outline: none;
+            list-style: none;
+        }
+        .hint-box summary::-webkit-details-marker {
+            display: none;
+        }
+        .hint-box summary::before {
+            content: '▶ ';
+            font-size: 0.8em;
+        }
+        .hint-box[open] summary::before {
+            content: '▼ ';
+        }
+        .hint-box .hint-content {
+            padding: 0 15px 15px 15px;
+            background-color: #1f1f1f;
+            border-top: 1px dashed #555;
+        }
+        
+        /* --- ネストされたヒントボックスのスタイル --- */
+        .nested-hint-box {
+            margin-top: 15px;
+            background-color: #111;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        .nested-hint-box summary {
+            color: #f0ad4e;
+            font-weight: normal;
+            font-size: 0.9em;
+        }
+        .nested-hint-box .hint-content {
+            border-top: 1px solid #444;
+            font-size: 0.9em;
+        }
+
+        /* --- 非表示用クラス --- */
+        .hidden {
+            display: none;
+        }
+        
+        /* --- キラキラ文字のスタイル --- */
+    
