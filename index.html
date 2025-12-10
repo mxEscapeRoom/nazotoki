@@ -206,12 +206,13 @@
 
     <div class="container">
 
-        <!-- ===== ステップ1: 8つの謎 ===== -->
+        <!-- ===== ステップ1: 7つの謎 ===== -->
         <div id="step1">
             <h1>リアル脱出ゲームサークルからの挑戦状</h1>
-            <p>8つの謎を解き明かし、答えを入力せよ。<br>※答えはすべて<strong>ひらがな</strong> を入力してください。</p>
+            <!-- ↓↓↓ 8つ → 7つ に修正しました ↓↓↓ -->
+            <p>7つの謎を解き明かし、答えを入力せよ。<br>※答えはすべて<strong>ひらがな</strong> を入力してください。</p>
             <div class="question-grid">
-                <!-- ↓↓↓ ラベルを「謎X」に修正しました ↓↓↓ -->
+                <!-- ↓↓↓ 謎8を削除し、7つに修正しました ↓↓↓ -->
                 <div class="question-item"><label for="q1">謎1</label><input type="text" id="q1" name="q1"></div>
                 <div class="question-item"><label for="q2">謎2</label><input type="text" id="q2" name="q2"></div>
                 <div class="question-item"><label for="q3">謎3</label><input type="text" id="q3" name="q3"></div>
@@ -219,7 +220,6 @@
                 <div class="question-item"><label for="q5">謎5</label><input type="text" id="q5" name="q5"></div>
                 <div class="question-item"><label for="q6">謎6</label><input type="text" id="q6" name="q6"></div>
                 <div class="question-item"><label for="q7">謎7</label><input type="text" id="q7" name="q7"></div>
-                <div class="question-item"><label for="q8">謎8</label><input type="text" id="q8" name="q8"></div>
             </div>
             <button id="check-step1" class="btn">回答を送信</button>
             <div id="feedback-message"></div>
@@ -230,7 +230,8 @@
             <h1>最終問題</h1>
             <div id="step1-answers-summary"></div>
             <h3>最後の謎</h3>
-            <p>この画像と8つの謎を元に、最後のキーワードを導き出せ。</p>
+            <!-- ↓↓↓ 8つ → 7つ に修正しました ↓↓↓ -->
+            <p>この画像と7つの謎の答えを元に、最後のキーワードを導き出せ。</p>
             <img id="riddle-image" src="https://github.com/mxEscapeRoom/nazotoki/blob/main/last.png?raw=true" alt="謎の画像">
             <div class="question-item" style="max-width: 300px; margin: 0 auto 30px auto;">
                 <label for="final-q">最後の答え</label>
@@ -262,7 +263,8 @@
             // == 設定エリア (非エンジニアもここを修正) ==
             // ==================================================
             const config = {
-                step1Answers: [ "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ" ],
+                // ↓↓↓ 答えを7つに修正しました ↓↓↓
+                step1Answers: [ "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ", "こたえ" ],
                 step2Answer: "みくしいなぞとき",
                 slackUrl: "https://mixigroup.enterprise.slack.com/archives/CKE9M28P8"
             };
@@ -276,7 +278,8 @@
             const step3 = document.getElementById('step3');
             const stepSecretClear = document.getElementById('step-secret-clear');
 
-            const step1Inputs = Array.from({ length: 8 }, (_, i) => document.getElementById(`q${i + 1}`));
+            // ↓↓↓ lengthを8から7に修正しました ↓↓↓
+            const step1Inputs = Array.from({ length: 7 }, (_, i) => document.getElementById(`q${i + 1}`));
             const checkStep1Btn = document.getElementById('check-step1');
             const feedbackMessage = document.getElementById('feedback-message');
             
@@ -311,14 +314,13 @@
                 const incorrectQuestions = [];
                 for (let i = 0; i < userAnswersLower.length; i++) {
                     if (userAnswersLower[i] !== correctAnswers[i]) {
-                        // ↓↓↓ 「問」を「謎」に修正しました ↓↓↓
                         incorrectQuestions.push(`謎${i + 1}`);
                     }
                 }
 
                 if (incorrectQuestions.length === 0) {
-                    // ↓↓↓ 「問」を「謎」に修正しました ↓↓↓
-                    let summaryHtml = '<h3>8つの謎の答え</h3><table class="summary-table">';
+                    // ↓↓↓ 8つ → 7つ に修正しました ↓↓↓
+                    let summaryHtml = '<h3>7つの謎の答え</h3><table class="summary-table">';
                     userAnswers.forEach((answer, index) => {
                         summaryHtml += `<tr><th>謎${index + 1}</th><td>${answer}</td></tr>`;
                     });
